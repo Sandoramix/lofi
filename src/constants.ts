@@ -53,5 +53,5 @@ export enum ApplicationUrl {
   Help = 'https://www.lofi.rocks/help',
   Discord = 'https://discord.gg/YuH9UJk',
   GitHub = 'https://github.com/dvx/lofi',
-  Spotify = 'spotify:'
+  Spotify = 'spotify:',
 }

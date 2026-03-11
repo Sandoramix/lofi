@@ -27,7 +27,6 @@ const WaitingWrapper = styled.div`
   }
 `;
 
-
 export const Waiting: FunctionComponent = () => {
   const handleOpenSpotify = useCallback(() => {
     ipcRenderer.send(IpcMessage.OpenLink, ApplicationUrl.Spotify);
