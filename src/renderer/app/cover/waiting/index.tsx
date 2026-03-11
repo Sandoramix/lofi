@@ -1,5 +1,8 @@
-import React, { FunctionComponent } from 'react';
+import { ipcRenderer } from 'electron';
+import React, { FunctionComponent, useCallback } from 'react';
 import styled from 'styled-components';
+
+import { ApplicationUrl, IpcMessage } from '../../../../constants';
 
 const WaitingWrapper = styled.div`
   overflow: hidden;
@@ -7,6 +10,7 @@ const WaitingWrapper = styled.div`
   top: 0;
   width: 100%;
   height: 100%;
+  cursor: pointer;
 
   p {
     margin: auto;
@@ -23,10 +27,22 @@ const WaitingWrapper = styled.div`
   }
 `;
 
-export const Waiting: FunctionComponent = () => (
-  <WaitingWrapper className="centered draggable">
-    <p className="draggable">
-      <i className="fab fa-spotify draggable" />
-    </p>
-  </WaitingWrapper>
-);
+
+export const Waiting: FunctionComponent = () => {
+  const handleOpenSpotify = useCallback(() => {
+    ipcRenderer.send(IpcMessage.OpenLink, ApplicationUrl.Spotify);
+  }, []);
+
+  return (
+    <WaitingWrapper
+      className="centered draggable"
+      onClick={handleOpenSpotify}
+      role="button"
+      tabIndex={0}
+      aria-label="Open Spotify">
+      <p>
+        <i className="fab fa-spotify" />
+      </p>
+    </WaitingWrapper>
+  );
+};
