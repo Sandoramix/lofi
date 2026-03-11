@@ -166,6 +166,11 @@ export const Cover: FunctionComponent<Props> = ({ settings, message, onVisualiza
     }
   }, [state.isPlaying, state.progress, state.userProfile?.accountType]);
 
+  const [localVolume, setLocalVolume] = useState(state.volume);
+  useEffect(() => {
+    setLocalVolume(state.volume);
+  }, [state.volume]);
+
   const changeVolume = useCallback(
     (newVolume: number) => {
       try {
@@ -191,18 +196,17 @@ export const Cover: FunctionComponent<Props> = ({ settings, message, onVisualiza
 
   const onMouseWheel = useCallback(
     async ({ deltaY }: WheelEvent): Promise<void> => {
-      const direction = Math.sign(deltaY);
-      const newVolume = clamp(state.volume - direction * volumeIncrement, 0, 100);
+      const direction = Math.sign(-deltaY);
+      console.log(`Mouse wheel direction: ${direction}`);
+      const newVolume = clamp(localVolume + volumeIncrement * direction, 0, 100);
+      setLocalVolume(newVolume);
       try {
-        // TODO use a state variable to buffer the volume change
-        if (newVolume !== state.volume) {
-          changeVolume(newVolume);
-        }
+        changeVolume(newVolume);
       } catch (error) {
         throw new Error(`Update volume error: ${error}`);
       }
     },
-    [changeVolume, state.volume, volumeIncrement]
+    [localVolume, volumeIncrement, changeVolume]
   );
 
   useEffect(() => {
