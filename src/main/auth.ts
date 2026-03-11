@@ -17,6 +17,8 @@ let onTokenRetrieved: (data: AuthData) => void = null;
 
 const AUTH_URL = 'https://accounts.spotify.com/authorize';
 const AUTH_TOKEN_URL = 'https://accounts.spotify.com/api/token';
+// TODO: migrate to `dotenv` or `t3-env` usage instead of keeping the client id in the code
+// (This is the original developer's client id, which is not valid anymore)
 const AUTH_CLIENT_ID = '69eca11b9ccd4bd3a7e01e6f9ddb5205';
 const AUTH_PORT = 41419;
 const AUTH_SCOPES = [
@@ -49,7 +51,7 @@ export const getAuthUrl = (): string => {
   const scopes = AUTH_SCOPES.join('%20');
 
   const authUrl =
-    `${AUTH_URL}?response_type=code&client_id=${AUTH_CLIENT_ID}&redirect_uri=http://localhost:${AUTH_PORT}&` +
+    `${AUTH_URL}?response_type=code&client_id=${AUTH_CLIENT_ID}&redirect_uri=http://127.0.0.1:${AUTH_PORT}&` +
     `scope=${scopes}&state=${codeState}&code_challenge=${codeChallenge}&code_challenge_method=S256`;
 
   return authUrl;
@@ -120,7 +122,7 @@ const retrieveAccessToken = async (verifier: string, code: string): Promise<Auth
 
   const body =
     `client_id=${AUTH_CLIENT_ID}&grant_type=authorization_code&` +
-    `code=${code}&redirect_uri=http://localhost:${AUTH_PORT}&code_verifier=${verifier}`;
+    `code=${code}&redirect_uri=http://127.0.0.1:${AUTH_PORT}&code_verifier=${verifier}`;
 
   const res = await fetch(AUTH_TOKEN_URL, {
     method: 'POST',
@@ -149,7 +151,7 @@ const stopServer = (): void => {
 };
 
 const handleServerResponse = async (request: http.IncomingMessage, response: http.ServerResponse): Promise<void> => {
-  const urlObj = new URL(`http://localhost:${AUTH_PORT}/${request.url}`);
+  const urlObj = new URL(`http://127.0.0.1:${AUTH_PORT}/${request.url}`);
   const queryState = urlObj.searchParams.get('state');
 
   try {
@@ -161,7 +163,7 @@ const handleServerResponse = async (request: http.IncomingMessage, response: htt
     }
 
     if (queryState !== codeState) {
-      console.error('Invalid state', JSON.stringify(urlObj));
+      console.error('Invalid state', urlObj.toJSON());
       response.end('Lofi authorization error: invalid state, you may close this window and retry.');
       return;
     }
